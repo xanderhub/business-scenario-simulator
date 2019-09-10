@@ -17,8 +17,6 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 public class BusinessScenarioSimulatorApplication implements CommandLineRunner {
 
-	private final Logger LOG = LoggerFactory.getLogger(BusinessScenarioSimulatorApplication.class);
-
 	private final EventBus eventBus;
 	private final ScenarioRepository scenarioRepository;
 	private final StateRepository stateRepository;
@@ -50,7 +48,7 @@ public class BusinessScenarioSimulatorApplication implements CommandLineRunner {
 
 		Scenario scenario = scenarioRepository.findByName("RENT_ORDER_CREATED");
 		Simulator simulator = new Simulator(scenario, eventBus, stateRepository);
-//
+
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		Task completeScenarioTask = AwaitTask.builder()
 				.name("Complete scenario!").duration(22L)
