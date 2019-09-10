@@ -51,13 +51,14 @@ public class SimulatorBootstrap implements ApplicationListener<ContextRefreshedE
         State waiting_for_rental_start = State.builder()
                 .type(StateType.INIT_STATE)
                 .name("Wait for rental commitment")
+                .description("Waits for customer to start his rent")
                 .scenario(scenario)
                 .build()
                 .saveTo(stateRepository);
         State push_user = State.builder()
                 .type(StateType.INTERMEDIATE_STATE)
                 .name("PUSH notification")
-                .description("Notifies user about open rental status by PUSH notification")
+                .description("Notifies customer about open rental status by PUSH notification")
                 .scenario(scenario)
                 .build()
                 .saveTo(stateRepository);
@@ -65,7 +66,7 @@ public class SimulatorBootstrap implements ApplicationListener<ContextRefreshedE
         State sms_user = State.builder()
                 .type(StateType.INTERMEDIATE_STATE)
                 .name("SMS notification")
-                .description("Notifies user about open rental status by SMS")
+                .description("Notifies customer about open rental status by SMS")
                 .scenario(scenario)
                 .build()
                 .saveTo(stateRepository);
@@ -81,7 +82,7 @@ public class SimulatorBootstrap implements ApplicationListener<ContextRefreshedE
         State rent_started = State.builder()
                 .type(StateType.FINAL_STATE)
                 .name("Rent started")
-                .description("User started using the car - complete this scenario")
+                .description("Customer started his rent - complete this scenario")
                 .scenario(scenario)
                 .build()
                 .saveTo(stateRepository);
