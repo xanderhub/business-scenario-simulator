@@ -34,6 +34,7 @@ that can occur in car sharing service. The following scenario designed to preven
 
 ### Database
 The following is a database design used to store all the entities mentioned above (__State__, __Task__ etc.).<br />
+In this project H2 database is used in-memory mode for demo purposes.
 * __Scenario__ entity is a "biggest" one. It's related to multiple __State__ entities and describes the whole process.
 * __State__ is a child entity of __Scenario__. It describes some business case and can execute multiple tasks. It also can have multiple transitions attached to it. State can be one of three types: *InitState*, *FinalState* and *IntermediateState*.
 * __Task__ is a child entitiy of __State__. Can be in multiple types: *AwaitTask* - task that waits (timer), *ConditionalTask* - fires different events based on provided condition (not implemented yet), *ScriptTask* - executes scripts (not implemented yet), and many other tasks to be implemented...
@@ -42,3 +43,55 @@ The following is a database design used to store all the entities mentioned abov
 <br />
 
 ![image](https://user-images.githubusercontent.com/33380175/64678921-42ead000-d483-11e9-9722-15700a86df63.png)
+
+
+### Application
+The project is built with Java 8 and Spring Boot framework. It also utilizes [spring reactor](https://projectreactor.io/) for dispatching events inside and outside simulation process. The app is using H2 database (in-memory mode) for storing mentioned entities. On application startup mentioned scenario is being built by `buildScenario()` method in `SimulatorBootstrap` class:
+
+First it builds the Scenario object
+```
+Scenario scenario = Scenario.builder()
+                .name("RENT_ORDER_CREATED")
+                .description("This scenario checks for car rental commitment after receiving rental order from customer")
+                .build()
+                .saveTo(scenarioRepository);
+
+```
+
+Then State objects are being declared and built:
+```
+        State waiting_for_rental_start = State.builder()
+                .type(StateType.INIT_STATE)
+                .name("Wait for rental commitment")
+                .description("Waits for customer to start his rent")
+                .scenario(scenario)
+                .build()
+                .saveTo(stateRepository);
+                
+        State push_user = State.builder()
+                .type(StateType.INTERMEDIATE_STATE)
+                .name("PUSH notification")
+                .description("Notifies customer about open rental status by PUSH notification")
+                .scenario(scenario)
+                .build()
+                .saveTo(stateRepository);
+```
+
+Then Transitions are defined between the states:
+```
+Transition start_to_finish = Transition.builder()
+                .sourceState(waiting_for_rental_start).targetState(rent_started)
+                .onEvent(Event.builder().name("RENT_STARTED").eventType(EventType.COMPLETE_SCENARIO).build().saveTo(eventRepository))
+                .build()
+                .saveTo(transitionRepository);
+```
+Note, here Transition object declared with its "triggering" Event object. See `onEvent()` setter  <br />
+Then the script is adding tasks (`AwaitTask`) for each State object:
+```
+waiting_for_rental_start.addTask(AwaitTask.builder().state(waiting_for_rental_start)
+                .name("Waiting for user to start the rent").duration(5L)
+                .eventOnTaskComplete(start_to_push_user.getOnEvent())
+                .build().saveTo(taskRepository));
+```
+Note, here Task is defined to fire Event object on completion in `eventOnTaskComplete()` setter.
+Duration of each `AwaitTask` object is set to 5 seconds for demo purposes.
