@@ -32,6 +32,13 @@ that can occur in car sharing service. The following scenario designed to preven
 
 ## Project design
 
+# Database
+The following is a database design used to store all the entities mentioned above (__State__, __Task__ etc.).<br />
+* __Scenario__ entity is a "biggest" one. It's related to multiple __State__ entities and describes the whole process.
+* __State__ is a child entity of __Scenario__. It describes some business case and can execute multiple tasks. It also can have multiple transitions attached to it. State can be one of three types: *InitState*, *FinalState* and *IntermediateState*.
+* __Task__ is a child entitiy of __State__. Can be in multiple types: *AwaitTask* - task that waits (timer), *ConditionalTask* - fires different events based on provided condition (not implemented yet), *ScriptTask* - executes scripts (not implemented yet), and many other tasks to be implemented...
+* __Transition__ entity that describes transition between states. Each transition has *source* and *target* state and __Event__ which "triggers" it. Transition can be "triggered" by only one __Event__ i.e. it has one-to-one relationship.
+* __Event__ entity that drives the simulation process (by triggering transitions) and being fired by __Task__ entities. Event can be internal - produced by some task, or external - produced by operator or some other simulator (if connected to the same event bus) 
 <br />
 
 ![image](https://user-images.githubusercontent.com/33380175/64678921-42ead000-d483-11e9-9722-15700a86df63.png)
