@@ -45,7 +45,7 @@ In this project H2 database is used in-memory mode for demo purposes.
 ![image](https://user-images.githubusercontent.com/33380175/64678921-42ead000-d483-11e9-9722-15700a86df63.png)
 
 
-### Application
+### Application - Scenario builder
 The project is built with Java 8 and Spring Boot framework. It also utilizes [spring reactor](https://projectreactor.io/) for dispatching events inside and outside simulation process. The app is using H2 database (in-memory mode) for storing mentioned entities. On application startup mentioned scenario is being built by `buildScenario()` method in `SimulatorBootstrap` class:
 
 First it builds the Scenario object
@@ -94,4 +94,32 @@ waiting_for_rental_start.addTask(AwaitTask.builder().state(waiting_for_rental_st
                 .build().saveTo(taskRepository));
 ```
 Note, here Task is defined to fire Event object on completion in `eventOnTaskComplete()` setter.
-Duration of each `AwaitTask` object is set to 5 seconds for demo purposes.
+Duration of each `AwaitTask` object is set to 5 seconds for demo purposes. <br />
+This script actually simulates some UI's output where end-user defines the business flow diagram  <br />
+
+### Application - Simulator
+In `run()` method of `BusinessScenarioSimulatorApplication` the Simulator object is being created and started:
+```
+  Scenario scenario = scenarioRepository.findByName("RENT_ORDER_CREATED");
+		Simulator simulator = new Simulator(scenario, eventBus, stateRepository);
+  
+  simulator.executeScenario();
+```
+Simulator needs a Scenario to execute, EventBus to get events from inside and outside and states repository to navigate between the states of business process. Once created, Simulator registers to the EventBus as a consumer and waits for incoming events.
+
+### Application - State
+Each State object can run multiple tasks, but in sequential order. It has an ExecutorService that allows to run only one thread at a time, so tasks will be executed one by one.
+State has `runOnSimulator()` method that Simulator calls to run the state:
+```
+public void runOnSimulator(final Simulator simulator){
+        LOG.info("STATE: {}", getName());
+        for (Task task: tasks) {
+            task.setSimulator(simulator);
+            task.setEventBus(simulator.getEventBus());
+            if(executorService.isTerminated())
+                executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(task);
+        }
+    }
+```
+When executing the method State registers all its tasks to Simulator's event bus, so Tasks could send events to it. 
