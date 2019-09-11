@@ -164,3 +164,17 @@ Note, how every 5 seconds state changes and then scenario completes at "Rent sta
 
 To see more detailed log run the app in DEBUG level:
 ![image](https://user-images.githubusercontent.com/33380175/64701032-a7705400-d4b0-11e9-86bd-695fd948075a.png)
+<br />
+<br />
+Navigate to H2 console - http://localhost:8080/h2-console and see stored entities:
+* __State__ table:
+![image](https://user-images.githubusercontent.com/33380175/64701597-ba375880-d4b1-11e9-8b31-38192ae931fa.png)
+* __Task__ table:
+![image](https://user-images.githubusercontent.com/33380175/64701744-071b2f00-d4b2-11e9-8772-b6dd889fc776.png)
+* __Transition__ table: <br />
+![image](https://user-images.githubusercontent.com/33380175/64701808-22863a00-d4b2-11e9-9650-463d9d70f661.png)
+* __Event__ table: <br />
+![image](https://user-images.githubusercontent.com/33380175/64702035-81e44a00-d4b2-11e9-9bac-24d9728d7736.png)
+
+
+
