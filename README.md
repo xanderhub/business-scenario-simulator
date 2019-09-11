@@ -32,7 +32,7 @@ that can occur in car sharing service. The following scenario designed to preven
 
 ## Project design
 
-# Database
+### Database
 The following is a database design used to store all the entities mentioned above (__State__, __Task__ etc.).<br />
 * __Scenario__ entity is a "biggest" one. It's related to multiple __State__ entities and describes the whole process.
 * __State__ is a child entity of __Scenario__. It describes some business case and can execute multiple tasks. It also can have multiple transitions attached to it. State can be one of three types: *InitState*, *FinalState* and *IntermediateState*.
