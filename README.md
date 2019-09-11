@@ -150,3 +150,17 @@ Timer task itself defined simply as following:
     }
 ```
 `isStoped` flag used when simulator shuts down all current tasks and switches to another state.
+
+
+## Running the app
+To run the application simply do:
+```
+./mvnw spring-boot:run
+```
+You will see the execution of this scenario in the logs:
+![image](https://user-images.githubusercontent.com/33380175/64700240-32e8e580-d4af-11e9-96c1-8318f1f69ba9.png)
+
+Note, how every 5 seconds state changes and then scenario completes at "Rent started / canceled" state - this happends after firing an external event from main method. See in `run()` method of `BusinessScenarioSimulatorApplication`. 
+
+To see more detailed log run the app in DEBUG level:
+![image](https://user-images.githubusercontent.com/33380175/64701032-a7705400-d4b0-11e9-86bd-695fd948075a.png)
