@@ -123,3 +123,30 @@ public void runOnSimulator(final Simulator simulator){
     }
 ```
 When executing the method State registers all its tasks to Simulator's event bus, so Tasks could send events to it. 
+When state is about to change as a result of some external event all its tasks need to be closed and no events should be fired.
+During transition between states the simulator shuts down all current tasks by calling `currentState.cancelAllTasks()` and switches to the next state `currentState = transition.getTargetState()`
+
+### Application - Task
+Currently it is only await task type supported (`AwaitTask`). This type of tasks can fire event before timer starts and after it completes. The following method sends event on task complete: 
+```
+    private void eventOnComplete() {
+        if (eventOnTaskComplete != null && !isStopped) {
+            eventBus.notify(object(simulator).getObject(), reactor.bus.Event.wrap(eventOnTaskComplete));
+            LOG.debug("eventOnTaskComplete fired - {}", eventOnTaskComplete);
+        }
+    }
+```
+Timer task itself defined simply as following:
+```
+@Override
+    protected void execute() {
+        if (duration != null)
+            try {
+                TimeUnit.SECONDS.sleep(duration);
+            } catch (InterruptedException e) {
+                LOG.debug("Task - {} - shut down", getName());
+                setIsStopped(true);
+            }
+    }
+```
+`isStoped` flag used when simulator shuts down all current tasks and switches to another state.
